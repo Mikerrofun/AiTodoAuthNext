@@ -1,9 +1,10 @@
 "use server";
 
-import { prisma } from "@shared/lib/prisma";
+import { RegisterFormData } from '@features/auth-by-email/auth/register/Register.type'
+import { prisma } from "@/prisma/client";
 import bcrypt from "bcrypt";
 
-export async function registerUser(data: { login: string; password: string }) {
+export async function registerUser(data : RegisterFormData ) {
   const hashed = await bcrypt.hash(data.password, 10)
 
   await prisma.user.create({
