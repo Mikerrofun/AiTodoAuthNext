@@ -3,7 +3,7 @@
 import { useRegister } from "./Register.hook";
 
 export function Register() {
-  const { register, handleSubmit, errors, onSubmit } = useRegister();
+  const { register, handleOnSubmit, errors } = useRegister();
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -12,20 +12,17 @@ export function Register() {
           Регистрация
         </h1>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
+        <form onSubmit={handleOnSubmit} className="flex flex-col gap-4">
           {/* Login */}
           <div className="flex flex-col gap-1">
-            <label
-              htmlFor="login"
-              className="text-sm font-medium text-gray-600"
-            >
+            <label htmlFor="login" className="text-sm font-medium text-gray-600">
               Логин
             </label>
             <input
               id="login"
               type="text"
               placeholder="Введите логин"
-              {...register("login", { required: "Логин обязателен" })}
+              {...register("login")}
               className="border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
             />
             {errors.login && (
@@ -35,26 +32,18 @@ export function Register() {
 
           {/* Password */}
           <div className="flex flex-col gap-1">
-            <label
-              htmlFor="password"
-              className="text-sm font-medium text-gray-600"
-            >
+            <label htmlFor="password" className="text-sm font-medium text-gray-600">
               Пароль
             </label>
             <input
               id="password"
               type="password"
               placeholder="Введите пароль"
-              {...register("password", {
-                required: "Пароль обязателен",
-                minLength: { value: 6, message: "Минимум 6 символов" },
-              })}
+              {...register("password")}
               className="border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
             />
             {errors.password && (
-              <span className="text-xs text-red-500">
-                {errors.password.message}
-              </span>
+              <span className="text-xs text-red-500">{errors.password.message}</span>
             )}
           </div>
 
