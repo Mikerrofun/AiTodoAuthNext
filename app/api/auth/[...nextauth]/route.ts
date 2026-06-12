@@ -58,7 +58,7 @@ const handler = NextAuth({
     // Вызывается когда читаешь сессию через useSession / getServerSession
     async session({ session, token }) {
       // Кладём userId из токена в сессию чтобы использовать в Server Actions
-      if (token.userId) {
+      if (token.userId && session.user) {
         session.user.id = token.userId as string;
       }
       return session;
