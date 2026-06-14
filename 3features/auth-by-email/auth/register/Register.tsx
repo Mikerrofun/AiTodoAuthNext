@@ -1,6 +1,7 @@
 "use client";
 
 import { useRegister } from "./Register.hook";
+import { AuthNavLink } from "@/5shared/ui/AuthNavLink/AuthNavLink";
 
 export function Register() {
   const { register, handleOnSubmit, errors } = useRegister();
@@ -54,6 +55,10 @@ export function Register() {
             Зарегистрироваться
           </button>
         </form>
+
+        <div className="mt-6">
+          <AuthNavLink text="Уже есть аккаунт?" linkText="Войти" href="/entrance" />
+        </div>
       </div>
     </div>
   );
