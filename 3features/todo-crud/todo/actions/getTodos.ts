@@ -5,10 +5,8 @@ import { authOptions } from "@/5shared/lib/auth/authOptions";
 import { prisma } from "@/prisma/client";
 import { ActionResult } from "@/5shared/lib/types/action-result";
 import { TodoItem } from "@entities/todo";
-import { CreateTodoFormData } from "@features/todo-crud/todo/createTodo/CreateTodo.type";
-import { revalidatePath } from "next/cache";
 
-export async function createTodo(data: CreateTodoFormData): Promise<ActionResult<TodoItem>> {
+export async function getTodos(): Promise<ActionResult<TodoItem[]>> {
   const session = await getServerSession(authOptions);
 
   if (!session?.user?.id) {
@@ -16,17 +14,12 @@ export async function createTodo(data: CreateTodoFormData): Promise<ActionResult
   }
 
   try {
-    const todo = await prisma.todo.create({
-      data: {
-        title: data.title.trim(),
-        description: data.description?.trim() ?? null,
-        completed: data.completed,
-        userId: Number(session.user.id),
-      },
+    const todos = await prisma.todo.findMany({
+      where: { userId: Number(session.user.id) },
+      orderBy: { createdAt: "desc" },
     });
 
-    revalidatePath("/profile");
-    return { status: "success", data: todo };
+    return { status: "success", data: todos };
   } catch {
     return { status: "error", message: "Что-то пошло не так" };
   }
