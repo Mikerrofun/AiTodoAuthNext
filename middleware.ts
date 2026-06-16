@@ -18,6 +18,11 @@ export async function middleware(req: NextRequest) {
     return NextResponse.redirect(new URL("/register", req.url));
   }
 
+  // Залогинен но не админ и пытается попасть на /admin → в профиль
+  if (pathname.startsWith("/admin") && token?.role !== "ADMIN") {
+    return NextResponse.redirect(new URL("/profile", req.url));
+  }
+
   // Корень / → редирект по статусу сессии
   if (pathname === "/") {
     return NextResponse.redirect(
@@ -29,5 +34,5 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/", "/entrance", "/register", "/profile/:path*"],
+  matcher: ["/", "/entrance", "/register", "/profile/:path*", "/admin/:path*"],
 };

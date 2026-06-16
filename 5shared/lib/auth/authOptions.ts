@@ -24,7 +24,7 @@ export const authOptions: NextAuthOptions = {
         const valid = await bcrypt.compare(credentials.password, user.password);
         if (!valid) return null;
 
-        return { id: String(user.id), name: user.login };
+        return { id: String(user.id), name: user.login, role: user.role };
       },
     }),
 
@@ -43,13 +43,15 @@ export const authOptions: NextAuthOptions = {
     async jwt({ token, user }) {
       if (user) {
         token.userId = user.id;
+        token.role = user.role;
       }
       return token;
     },
 
     async session({ session, token }) {
       if (token.userId && session.user) {
-        session.user.id = token.userId as string;
+        session.user.id = token.userId;
+        session.user.role = token.role;
       }
       return session;
     },
