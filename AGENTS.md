@@ -5,5 +5,3 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 use SKILL.md
 <!-- END:nextjs-agent-rules -->
-
-
