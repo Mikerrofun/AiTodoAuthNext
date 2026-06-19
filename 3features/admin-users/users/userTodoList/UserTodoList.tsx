@@ -1,84 +1,65 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { getUserTodos } from "@features/admin-users/users/actions/getUserTodos";
-import { TodoItem } from "@entities/todo";
+import { UserTodoListProps } from "./UserTodoList.type";
 
-type Props = {
-  userId: number;
-  userName: string;
-};
+function LoadingFallback() {
+  return (
+    <div className="flex items-center gap-2 text-gray-500">
+      <svg
+        className="animate-spin h-4 w-4"
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+      >
+        <circle
+          className="opacity-25"
+          cx="12"
+          cy="12"
+          r="10"
+          stroke="currentColor"
+          strokeWidth="4"
+        />
+        <path
+          className="opacity-75"
+          fill="currentColor"
+          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+        />
+      </svg>
+      <span className="text-sm">Загрузка задач...</span>
+    </div>
+  );
+}
 
-export function UserTodoList({ userId, userName }: Props) {
-  const [todos, setTodos] = useState<TodoItem[] | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+function TodoListContent({ userId, userName }: UserTodoListProps) {
+  const { data: result, error } = useQuery({
+    queryKey: ["todos", userId],
+    queryFn: () => getUserTodos(userId),
+    staleTime: 5 * 60 * 1000, 
+  });
 
-  useEffect(() => {
-    let cancelled = false;
-
-    async function loadTodos() {
-      setLoading(true);
-      setError(null);
-
-      const result = await getUserTodos(userId);
-
-      if (cancelled) return;
-
-      if (result.status === "error") {
-        setError(result.message);
-        setLoading(false);
-        return;
-      }
-
-      setTodos(result.data);
-      setLoading(false);
-    }
-
-    loadTodos();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [userId]);
-
-  if (loading) {
-    return (
-      <div className="flex items-center gap-2 text-gray-500">
-        <svg
-          className="animate-spin h-4 w-4"
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-        >
-          <circle
-            className="opacity-25"
-            cx="12"
-            cy="12"
-            r="10"
-            stroke="currentColor"
-            strokeWidth="4"
-          />
-          <path
-            className="opacity-75"
-            fill="currentColor"
-            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-          />
-        </svg>
-        <span className="text-sm">Загрузка задач...</span>
-      </div>
-    );
-  }
-
+   
   if (error) {
     return (
       <div className="text-sm text-red-600">
-        Ошибка загрузки задач: {error}
+        Ошибка загрузки задач: {error.message}
       </div>
     );
   }
 
-  if (!todos || todos.length === 0) {
+  if (result?.status === "error") {
+    return (
+      <div className="text-sm text-red-600">
+        Ошибка: {result.message}
+      </div>
+    );
+  }
+
+  const todos = result?.data ?? [];
+
+  if (todos.length === 0) {
     return (
       <div className="text-sm text-gray-500 italic">
         У пользователя {userName} пока нет задач
@@ -141,5 +122,13 @@ export function UserTodoList({ userId, userName }: Props) {
         ))}
       </ul>
     </div>
+  );
+}
+
+export function UserTodoList(props: UserTodoListProps) {
+  return (
+    <Suspense fallback={<LoadingFallback />}>
+      <TodoListContent {...props} />
+    </Suspense>
   );
 }
