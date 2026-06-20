@@ -7,15 +7,18 @@ import { prisma } from "@/prisma/client";
 import { ActionResult } from "@/5shared/lib/types/action-result";
 import { TodoItem } from "@entities/todo";
 
-const getCachedUserTodos = unstable_cache(
-  async (userId: number) => {
+const getCachedUserTodos = (userId: number) => unstable_cache(
+  async () => {
     return await prisma.todo.findMany({
-      where: { userId },
+      where: { userId, deletedAt: null },
     });
   },
-  ["user-todos"],
-  { revalidate: 300 }
-);
+  [`user-todos-${userId}`],
+  { 
+    revalidate: 300,
+    tags: [`user-todos-${userId}`]
+  }
+)();
 
 export async function getUserTodos(userId: number): Promise<ActionResult<TodoItem[]>> {
   const session = await getServerSession(authOptions);
@@ -29,6 +32,13 @@ export async function getUserTodos(userId: number): Promise<ActionResult<TodoIte
   }
 
   try {
+    const fifteenDaysAgo = new Date(Date.now() - 15 * 24 * 60 * 60 * 1000);
+    await prisma.todo.deleteMany({
+      where: {
+        deletedAt: { lte: fifteenDaysAgo },
+      },
+    });
+
     const todos = await getCachedUserTodos(userId);
     return { status: "success", data: todos };
   } catch {

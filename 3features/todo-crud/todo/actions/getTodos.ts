@@ -15,7 +15,7 @@ export async function getTodos(): Promise<ActionResult<TodoItem[]>> {
 
   try {
     const todos = await prisma.todo.findMany({
-      where: { userId: Number(session.user.id) },
+      where: { userId: Number(session.user.id), deletedAt: null },
       orderBy: { createdAt: "desc" },
     });
 
