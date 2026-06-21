@@ -1,6 +1,5 @@
 "use server";
 
-import { revalidateTag } from "next/cache";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/5shared/lib/auth/authOptions";
 import { prisma } from "@/prisma/client";
@@ -21,7 +20,6 @@ export async function adminSoftDeleteTodo(
   }
 
   try {
-    // Проверяем что задача принадлежит указанному пользователю (для консистентности)
     const todo = await prisma.todo.findFirst({
       where: { id: todoId, userId },
       select: { id: true },
@@ -35,9 +33,7 @@ export async function adminSoftDeleteTodo(
       where: { id: todoId },
       data: { deletedAt: new Date() },
     });
-    
-    revalidateTag(`user-todos-${userId}`, "max");
-    
+
     return { status: "success" };
   } catch {
     return { status: "error", message: "Не удалось удалить задачу" };

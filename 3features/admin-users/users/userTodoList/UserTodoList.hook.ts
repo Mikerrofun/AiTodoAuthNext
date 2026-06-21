@@ -1,22 +1,22 @@
 import { useCallback } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { getUserTodos } from "@features/admin-users/users/actions/getUserTodos";
+import { getAdminUserTodos } from "@features/admin-users/users/actions/getAdminUserTodos";
 import { adminSoftDeleteTodo } from "@features/admin-users/users/actions/adminSoftDeleteTodo";
 
 export function useUserTodoList(userId: number) {
   const queryClient = useQueryClient();
 
   const { data: result, error } = useQuery({
-    queryKey: ["todos", userId],
-    queryFn: () => getUserTodos(userId),
-    staleTime: 5 * 60 * 1000,
+    queryKey: ["admin-todos", userId],
+    queryFn: () => getAdminUserTodos(userId),
+    staleTime: 0, // всегда свежие данные для админки
   });
 
   const deleteMutation = useMutation({
     mutationFn: ({ todoId, userId }: { todoId: number; userId: number }) =>
       adminSoftDeleteTodo(todoId, userId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["todos", userId] });
+      queryClient.invalidateQueries({ queryKey: ["admin-todos", userId] });
     },
   });
 
