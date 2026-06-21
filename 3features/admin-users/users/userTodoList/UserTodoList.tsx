@@ -2,6 +2,7 @@
 
 import { Suspense } from "react";
 import { SuspenseLoader } from "@/5shared/ui/SuspenseLoader";
+import { ErrorBoundary } from "@/5shared/ui/ErrorBoundary";
 import { UserTodoListProps } from "./UserTodoList.type";
 import { useUserTodoList } from "./UserTodoList.hook";
 import { TodoItem } from "./TodoItem";
@@ -44,8 +45,12 @@ function TodoListContent({ userId, userName }: UserTodoListProps) {
 
 export function UserTodoList(props: UserTodoListProps) {
   return (
-    <Suspense fallback={<SuspenseLoader message="Загрузка задач..." size="sm" />}>
-      <TodoListContent {...props} />
-    </Suspense>
+    <ErrorBoundary
+      fallback={<div className="text-sm text-red-600">Ошибка загрузки задач</div>}
+    >
+      <Suspense fallback={<SuspenseLoader message="Загрузка задач..." size="sm" />}>
+        <TodoListContent {...props} />
+      </Suspense>
+    </ErrorBoundary>
   );
 }
