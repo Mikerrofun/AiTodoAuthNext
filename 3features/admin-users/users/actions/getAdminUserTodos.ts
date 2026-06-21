@@ -28,11 +28,6 @@ export async function getAdminUserTodos(userId: number): Promise<ActionResult<To
       return { status: "success", data: cached };
     }
 
-    const fifteenDaysAgo = new Date(Date.now() - 15 * 24 * 60 * 60 * 1000);
-    await prisma.todo.deleteMany({
-      where: { deletedAt: { lte: fifteenDaysAgo } },
-    });
-
     const todos = await prisma.todo.findMany({
       where: { userId },
       orderBy: { createdAt: "desc" },

@@ -1,0 +1,5 @@
+{
+  "crons": [
+    { "path": "/api/cron/gc-todos", "schedule": "0 3 * * *" }
+  ]
+}

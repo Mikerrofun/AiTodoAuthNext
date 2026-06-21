@@ -7,8 +7,7 @@ import { ActionResult } from "@/5shared/lib/types/action-result";
 import { redis } from "@/5shared/lib/redis/redis";
 
 export async function adminSoftDeleteTodo(
-  todoId: number,
-  userId: number
+  todoId: number
 ): Promise<ActionResult<void>> {
   const session = await getServerSession(authOptions);
 
@@ -21,21 +20,15 @@ export async function adminSoftDeleteTodo(
   }
 
   try {
-    const todo = await prisma.todo.findFirst({
-      where: { id: todoId, userId },
-      select: { id: true },
-    });
-
-    if (!todo) {
-      return { status: "error", message: "Задача не найдена или не принадлежит пользователю" };
-    }
-
-    await prisma.todo.update({
+    // userId достаём из БД, а не из параметров клиента — иначе подмена userId
+    // инвалидирует чужой кэш, оставив реальный кэш владельца несогласованным.
+    const updated = await prisma.todo.update({
       where: { id: todoId },
       data: { deletedAt: new Date() },
+      select: { userId: true },
     });
 
-    await redis.del(`admin:todos:${userId}`);
+    await redis.del(`admin:todos:${updated.userId}`);
 
     return { status: "success" };
   } catch {
