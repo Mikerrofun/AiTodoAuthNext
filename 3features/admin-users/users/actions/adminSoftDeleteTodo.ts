@@ -4,6 +4,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/5shared/lib/auth/authOptions";
 import { prisma } from "@/prisma/client";
 import { ActionResult } from "@/5shared/lib/types/action-result";
+import { redis } from "@/5shared/lib/redis/redis";
 
 export async function adminSoftDeleteTodo(
   todoId: number,
@@ -33,6 +34,8 @@ export async function adminSoftDeleteTodo(
       where: { id: todoId },
       data: { deletedAt: new Date() },
     });
+
+    await redis.del(`admin:todos:${userId}`);
 
     return { status: "success" };
   } catch {
