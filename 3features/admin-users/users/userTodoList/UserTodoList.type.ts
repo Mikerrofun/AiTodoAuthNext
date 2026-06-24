@@ -7,4 +7,5 @@ export type UserTodoListProps = {
 
 export type TodoItemProps = {
   todo: TodoItemType;
+  onDelete?: (todoId: number) => void;
 };

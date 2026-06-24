@@ -1,5 +1,6 @@
 import { getToken } from "next-auth/jwt";
 import { NextRequest, NextResponse } from "next/server";
+import { redis } from "@/5shared/lib/redis/redis";
 
 const PUBLIC_PATHS = ["/entrance", "/register"];
 
@@ -9,6 +10,7 @@ export async function middleware(req: NextRequest) {
 
   const isPublic = PUBLIC_PATHS.some((p) => pathname.startsWith(p));
 
+  
   if (token && isPublic) {
     return NextResponse.redirect(new URL("/profile", req.url));
   }
@@ -29,10 +31,25 @@ export async function middleware(req: NextRequest) {
       new URL(token ? "/profile" : "/register", req.url)
     );
   }
+// if (pathname === "/banned") {
+//     const banned = await redis.get(`blacklist:${token?.userId}`);
+    
+//     if (banned) {
+//         return NextResponse.next();
+//     }
+    
+//     return NextResponse.redirect(new URL(token ? "/profile" : "/register", req.url));
+// }
+  const banned = await redis.get(`blacklist:${token?.userId}`);
+  if (banned) {
+    return NextResponse.redirect(new URL("/banned", req.url));
+  }
+
+
 
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/", "/entrance", "/register", "/profile/:path*", "/admin/:path*"],
+  matcher: ["/", "/entrance", "/register", "/profile/:path*", "/admin/:path*", "/banned"],
 };

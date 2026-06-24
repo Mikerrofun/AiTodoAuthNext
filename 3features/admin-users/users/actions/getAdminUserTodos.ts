@@ -1,23 +1,15 @@
 "use server";
 
-import { unstable_cache } from "next/cache";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/5shared/lib/auth/authOptions";
 import { prisma } from "@/prisma/client";
 import { ActionResult } from "@/5shared/lib/types/action-result";
 import { TodoItem } from "@entities/todo";
+import { redis } from "@/5shared/lib/redis/redis";
 
-const getCachedUserTodos = unstable_cache(
-  async (userId: number) => {
-    return await prisma.todo.findMany({
-      where: { userId },
-    });
-  },
-  ["user-todos"],
-  { revalidate: 300 }
-);
+const CACHE_TTL = 3600;
 
-export async function getUserTodos(userId: number): Promise<ActionResult<TodoItem[]>> {
+export async function getAdminUserTodos(userId: number): Promise<ActionResult<TodoItem[]>> {
   const session = await getServerSession(authOptions);
 
   if (!session?.user) {
@@ -28,8 +20,21 @@ export async function getUserTodos(userId: number): Promise<ActionResult<TodoIte
     return { status: "error", message: "Недостаточно прав" };
   }
 
+  const cacheKey = `admin:todos:${userId}`;
+
   try {
-    const todos = await getCachedUserTodos(userId);
+    const cached = await redis.get<TodoItem[]>(cacheKey);
+    if (cached) {
+      return { status: "success", data: cached };
+    }
+
+    const todos = await prisma.todo.findMany({
+      where: { userId },
+      orderBy: { createdAt: "desc" },
+    });
+
+    await redis.setex(cacheKey, CACHE_TTL, JSON.stringify(todos));
+
     return { status: "success", data: todos };
   } catch {
     return { status: "error", message: "Что-то пошло не так" };

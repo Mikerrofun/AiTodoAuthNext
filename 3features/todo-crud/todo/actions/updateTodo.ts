@@ -7,6 +7,7 @@ import { ActionResult } from "@/5shared/lib/types/action-result";
 import { TodoItem } from "@entities/todo";
 import { UpdateTodoFormData } from "@features/todo-crud/todo/updateTodo/UpdateTodo.type";
 import { revalidatePath } from "next/cache";
+import { redis } from "@/5shared/lib/redis/redis";
 
 export async function updateTodo(id: number, data: UpdateTodoFormData): Promise<ActionResult<TodoItem>> {
   const session = await getServerSession(authOptions);
@@ -29,6 +30,7 @@ export async function updateTodo(id: number, data: UpdateTodoFormData): Promise<
     });
 
     revalidatePath("/profile");
+    await redis.del(`user:todos:${session.user.id}`);
     return { status: "success", data: todo };
   } catch {
     return { status: "error", message: "Задача не найдена или нет доступа" };

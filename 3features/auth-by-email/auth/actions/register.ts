@@ -5,6 +5,7 @@ import { ActionResult } from "@/5shared/lib/types/action-result";
 import { prisma } from "@/prisma/client";
 import { Prisma } from "@prisma/client";
 import bcrypt from "bcrypt";
+import { redis } from "@/5shared/lib/redis/redis";
 
 export async function registerUser(data: RegisterFormData): Promise<ActionResult> {
   try {
@@ -16,6 +17,8 @@ export async function registerUser(data: RegisterFormData): Promise<ActionResult
         password: hashed,
       },
     });
+
+    await redis.del("admin:users");
 
     return { status: "success" };
 

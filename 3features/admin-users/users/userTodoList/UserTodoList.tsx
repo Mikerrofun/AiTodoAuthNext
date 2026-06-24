@@ -1,34 +1,19 @@
 "use client";
 
 import { Suspense } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { getUserTodos } from "@features/admin-users/users/actions/getUserTodos";
-import { UserTodoListProps } from "./UserTodoList.type";
-import { TodoItem } from "./TodoItem";
 import { SuspenseLoader } from "@/5shared/ui/SuspenseLoader";
+import { ErrorBoundary } from "@/5shared/ui/ErrorBoundary";
+import { UserTodoListProps } from "./UserTodoList.type";
+import { useUserTodoList } from "./UserTodoList.hook";
+import { TodoItem } from "./TodoItem";
 
 function TodoListContent({ userId, userName }: UserTodoListProps) {
-  const { data: result, error } = useQuery({
-    queryKey: ["todos", userId],
-    queryFn: () => getUserTodos(userId),
-    staleTime: 5 * 60 * 1000,
-  });
+  const { todos, queryError, isDeletePending, isDeleteError, handleDelete } =
+    useUserTodoList(userId);
 
-  if (error) {
-    return (
-      <div className="text-sm text-red-600">
-        Ошибка загрузки задач: {error.message}
-      </div>
-    );
+  if (queryError) {
+    return <div className="text-sm text-red-600">Ошибка: {queryError}</div>;
   }
-
-  if (result?.status === "error") {
-    return (
-      <div className="text-sm text-red-600">Ошибка: {result.message}</div>
-    );
-  }
-
-  const todos = result?.data ?? [];
 
   if (todos.length === 0) {
     return (
@@ -43,9 +28,15 @@ function TodoListContent({ userId, userName }: UserTodoListProps) {
       <div className="text-sm font-medium text-gray-700 mb-2">
         Задачи пользователя {userName} ({todos.length})
       </div>
+      {isDeletePending && (
+        <div className="text-xs text-blue-600">Удаление...</div>
+      )}
+      {isDeleteError && (
+        <div className="text-xs text-red-600">Ошибка при удалении</div>
+      )}
       <ul className="space-y-1.5">
         {todos.map((todo) => (
-          <TodoItem key={todo.id} todo={todo} />
+          <TodoItem key={todo.id} todo={todo} onDelete={handleDelete} />
         ))}
       </ul>
     </div>
@@ -54,8 +45,12 @@ function TodoListContent({ userId, userName }: UserTodoListProps) {
 
 export function UserTodoList(props: UserTodoListProps) {
   return (
-    <Suspense fallback={<SuspenseLoader message="Загрузка задач..." size="sm" />}>
-      <TodoListContent {...props} />
-    </Suspense>
+    <ErrorBoundary
+      fallback={<div className="text-sm text-red-600">Ошибка загрузки задач</div>}
+    >
+      <Suspense fallback={<SuspenseLoader message="Загрузка задач..." size="sm" />}>
+        <TodoListContent {...props} />
+      </Suspense>
+    </ErrorBoundary>
   );
 }
