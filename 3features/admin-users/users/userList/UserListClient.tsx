@@ -45,6 +45,7 @@ export function UserListClient({ users }: UserListClientProps) {
               user={user}
               isExpanded={expandedIds.has(user.id)}
               onToggle={handleToggle}
+              
             />
           ))}
         </tbody>
