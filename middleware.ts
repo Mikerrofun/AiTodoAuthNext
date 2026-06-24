@@ -31,14 +31,18 @@ export async function middleware(req: NextRequest) {
       new URL(token ? "/profile" : "/register", req.url)
     );
   }
-
-  if (pathname === "/banned" && token) {
-    return NextResponse.next();
-  }
-  
+// if (pathname === "/banned") {
+//     const banned = await redis.get(`blacklist:${token?.userId}`);
+    
+//     if (banned) {
+//         return NextResponse.next();
+//     }
+    
+//     return NextResponse.redirect(new URL(token ? "/profile" : "/register", req.url));
+// }
   const banned = await redis.get(`blacklist:${token?.userId}`);
   if (banned) {
-    return NextResponse.redirect("/banned");
+    return NextResponse.redirect(new URL("/banned", req.url));
   }
 
 
@@ -47,5 +51,5 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/", "/entrance", "/register", "/profile/:path*", "/admin/:path*" , "/banned"],
+  matcher: ["/", "/entrance", "/register", "/profile/:path*", "/admin/:path*", "/banned"],
 };

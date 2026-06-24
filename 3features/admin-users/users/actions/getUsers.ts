@@ -14,6 +14,7 @@ export type UserItem = {
   login: string;
   role: string;
   createdAt: Date;
+  bannedAt: Date | null;
 };
 
 export async function getUsers(): Promise<ActionResult<UserItem[]>> {
@@ -40,6 +41,7 @@ export async function getUsers(): Promise<ActionResult<UserItem[]>> {
         login: true,
         role: true,
         createdAt: true,
+        bannedAt: true,
       },
     });
 

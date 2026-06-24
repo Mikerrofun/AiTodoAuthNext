@@ -35,7 +35,8 @@ export function UserListClient({ users }: UserListClientProps) {
             <th className="py-2 pr-4 font-medium">ID</th>
             <th className="py-2 pr-4 font-medium">Логин</th>
             <th className="py-2 pr-4 font-medium">Роль</th>
-            <th className="py-2 font-medium">Дата регистрации</th>
+            <th className="py-2 pr-4 font-medium">Дата регистрации</th>
+            <th className="py-2 font-medium">Статус</th>
           </tr>
         </thead>
         <tbody>
