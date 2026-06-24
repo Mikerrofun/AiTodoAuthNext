@@ -32,7 +32,7 @@ export async function middleware(req: NextRequest) {
     );
   }
 
-  if (pathname === "/banned") {
+  if (pathname === "/banned" && token) {
     return NextResponse.next();
   }
   
