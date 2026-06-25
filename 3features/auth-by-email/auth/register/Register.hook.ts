@@ -2,6 +2,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { registerSchema, type RegisterFormData } from "./Register.type";
 import { registerUser } from "@/3features/auth-by-email/auth/actions/register";
+import { checkLoginStatus } from "@/3features/auth-by-email/auth/actions/checkLoginStatus";
 import { signIn } from "next-auth/react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -21,6 +22,7 @@ export function useRegister() {
 
   const handleOnSubmit = handleSubmit(async (data: RegisterFormData) => {
     setServerError(null)
+    
     const result = await registerUser(data)
 
     if (result.status === "error") {
@@ -28,7 +30,13 @@ export function useRegister() {
       return
     }
 
-    // Юзер создан — логиним его чтобы получить сессию
+    const banCheck = await checkLoginStatus(data.login)
+    
+    if (banCheck.status === "success" && banCheck.data?.banned) {
+      router.push("/banned")
+      return
+    }
+
     const signInResult = await signIn("credentials", {
       redirect: false,
       login: data.login,

@@ -31,7 +31,9 @@ const updated = await prisma.user.update({
 });
 
 
-    await redis.set("blacklist:" + updated.id, "banned", { ex: 600 });
+
+    await redis.set("blacklist:" + updated.id, "banned");
+    
     await redis.del("admin:users");
     return { status: "success" };
   } catch {

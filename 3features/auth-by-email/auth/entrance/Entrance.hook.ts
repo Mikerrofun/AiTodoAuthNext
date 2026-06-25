@@ -1,6 +1,7 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { entranceSchema, type EntranceFormData, type OAuthProvider } from "./Entrance.type";
+import { checkLoginStatus } from "@/3features/auth-by-email/auth/actions/checkLoginStatus";
 import { signIn } from "next-auth/react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -20,6 +21,13 @@ export function useEntrance() {
 
   const handleOnSubmit = handleSubmit(async (data: EntranceFormData) => {
     setServerError(null);
+
+    const banCheck = await checkLoginStatus(data.login);
+    
+    if (banCheck.status === "success" && banCheck.data?.banned) {
+      router.push("/banned");
+      return;
+    }
 
     const result = await signIn("credentials", {
       redirect: false,
