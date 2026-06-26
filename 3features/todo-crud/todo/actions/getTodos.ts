@@ -3,23 +3,17 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/5shared/lib/auth/authOptions";
 import { prisma } from "@/prisma/client";
-import { ActionResult } from "@/5shared/lib/types/action-result";
+import { ActionSuccess, ActionError } from "@/5shared/lib/types/action-result";
 import { TodoItem } from "@entities/todo";
 import { redis } from "@/5shared/lib/redis/redis";
-import { checkUserBan } from "@/5shared/lib/auth/checkBan";
 
 const CACHE_TTL = 300;
 
-export async function getTodos(): Promise<ActionResult<TodoItem[]>> {
+export async function getTodos(): Promise<ActionSuccess<TodoItem[]> | ActionError> {
   const session = await getServerSession(authOptions);
 
   if (!session?.user?.id) {
     return { status: "error", message: "Не авторизован" };
-  }
-
-  // ✅ ПРОВЕРКА БАНА: Даже чтение блокируем для забаненных
-  if (await checkUserBan(session.user.id)) {
-    return { status: "error", message: "Ваш аккаунт заблокирован" };
   }
 
   const cacheKey = `user:todos:${session.user.id}`;

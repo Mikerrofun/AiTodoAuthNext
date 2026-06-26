@@ -15,7 +15,7 @@ export async function deleteTodo(id: number): Promise<ActionResult> {
     return { status: "error", message: "Не авторизован" };
   }
   if (await checkUserBan(session.user.id)) {
-    return { status: "error", message: "Ваш аккаунт заблокирован" };
+    return { status: "banned" };
   }
 
   try {

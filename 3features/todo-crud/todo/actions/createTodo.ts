@@ -18,7 +18,7 @@ export async function createTodo(data: CreateTodoFormData): Promise<ActionResult
   }
 
   if (await checkUserBan(session.user.id)) {
-    return { status: "error", message: "Ваш аккаунт заблокирован" };
+    return { status: "banned" };
   }
 
   try {
