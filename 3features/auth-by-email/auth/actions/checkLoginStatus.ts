@@ -1,14 +1,13 @@
 "use server";
 
 import { prisma } from "@/prisma/client";
+import { redis } from "@/5shared/lib/redis/redis";
 import { ActionResult } from "@/5shared/lib/types/action-result";
 
 /**
  * Проверяет статус бана пользователя по логину (БЕЗ пароля)
  * Используется клиентом ПЕРЕД попыткой логина через NextAuth
- * 
- * @param login - Логин пользователя
- * @returns объект с полем banned (true/false)
+ * Источник истины — Redis (чтобы учитывать TTL временных банов)
  */
 export async function checkLoginStatus(
   login: string
@@ -16,12 +15,19 @@ export async function checkLoginStatus(
   try {
     const user = await prisma.user.findUnique({
       where: { login },
-      select: { bannedAt: true },
+      select: { id: true },
     });
+
+    if (!user) {
+      return { status: "success", data: { banned: false } };
+    }
+
+    // Проверяем Redis — единственный источник истины для актуального статуса
+    const banned = await redis.get(`blacklist:${user.id}`);
 
     return {
       status: "success",
-      data: { banned: !!user?.bannedAt },
+      data: { banned: !!banned },
     };
   } catch (error) {
     console.error("Error checking login status:", error);

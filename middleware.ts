@@ -2,13 +2,9 @@ import { getToken } from "next-auth/jwt";
 import { NextRequest, NextResponse } from "next/server";
 import { redis } from "@/5shared/lib/redis/redis";
 
-const PUBLIC_PATHS = ["/entrance", "/register", "/banned"];
-
 export async function middleware(req: NextRequest) {
   const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
   const { pathname } = req.nextUrl;
-
-  const isPublic = PUBLIC_PATHS.some((p) => pathname.startsWith(p));
 
   if (token && (pathname.startsWith("/entrance") || pathname.startsWith("/register"))) {
     return NextResponse.redirect(new URL("/profile", req.url));

@@ -11,7 +11,7 @@ export function useBanButton(userId: number, initialBannedAt: Date | null) {
     const prev = isBanned;
     setIsBanned(!prev);
 
-    const result = prev ? await unbanUser(userId) : await banUser(userId);
+    const result = prev ? await unbanUser(userId) : await banUser(userId, 0);
 
     if (result.status === "error") {
       setIsBanned(prev);

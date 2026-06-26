@@ -2,7 +2,6 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { registerSchema, type RegisterFormData } from "./Register.type";
 import { registerUser } from "@/3features/auth-by-email/auth/actions/register";
-import { checkLoginStatus } from "@/3features/auth-by-email/auth/actions/checkLoginStatus";
 import { signIn } from "next-auth/react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -27,13 +26,6 @@ export function useRegister() {
 
     if (result.status === "error") {
       setServerError(result.message)
-      return
-    }
-
-    const banCheck = await checkLoginStatus(data.login)
-    
-    if (banCheck.status === "success" && banCheck.data?.banned) {
-      router.push("/banned")
       return
     }
 
