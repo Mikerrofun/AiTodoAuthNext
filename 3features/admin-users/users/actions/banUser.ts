@@ -7,7 +7,8 @@ import { ActionResult } from "@/5shared/lib/types/action-result";
 import { redis } from "@/5shared/lib/redis/redis";
 
 export async function banUser(
-  userId: number
+  userId: number,
+  durationSeconds?: number,
 ): Promise<ActionResult<void>> {
   const session = await getServerSession(authOptions);
 
@@ -25,13 +26,22 @@ const updated = await prisma.user.update({
     id: userId
   },
   data: {
-    bannedAt: new Date() 
+    bannedAt: new Date(),
+    bannedUntil: durationSeconds
+      ? new Date(Date.now() + durationSeconds * 1000)
+      : null,
   },
   select: { id: true },
 });
 
 
-    await redis.set("blacklist:" + updated.id, "banned", { ex: 600 });
+
+    if (durationSeconds) {
+      await redis.set(`blacklist:${updated.id}`, "banned", { ex: durationSeconds });
+    } else {
+      await redis.set(`blacklist:${updated.id}`, "banned"); // без TTL = постоянный
+    }
+    
     await redis.del("admin:users");
     return { status: "success" };
   } catch {

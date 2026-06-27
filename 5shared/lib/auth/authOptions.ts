@@ -4,6 +4,8 @@ import GoogleProvider from "next-auth/providers/google";
 import GithubProvider from "next-auth/providers/github";
 import { prisma } from "@/prisma/client";
 import bcrypt from "bcrypt";
+import { redis } from "@/5shared/lib/redis/redis";
+
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -23,6 +25,9 @@ export const authOptions: NextAuthOptions = {
 
         const valid = await bcrypt.compare(credentials.password, user.password);
         if (!valid) return null;
+
+        const banned = await redis.get(`blacklist:${user.id}`);
+        if (banned) return null;
 
         return { id: String(user.id), name: user.login, role: user.role };
       },

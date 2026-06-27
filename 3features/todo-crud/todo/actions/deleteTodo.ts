@@ -6,12 +6,16 @@ import { prisma } from "@/prisma/client";
 import { ActionResult } from "@/5shared/lib/types/action-result";
 import { revalidatePath } from "next/cache";
 import { redis } from "@/5shared/lib/redis/redis";
+import { checkUserBan } from "@/5shared/lib/auth/checkBan";
 
 export async function deleteTodo(id: number): Promise<ActionResult> {
   const session = await getServerSession(authOptions);
 
   if (!session?.user?.id) {
     return { status: "error", message: "Не авторизован" };
+  }
+  if (await checkUserBan(session.user.id)) {
+    return { status: "banned" };
   }
 
   try {

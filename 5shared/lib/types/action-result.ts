@@ -7,4 +7,8 @@ export type ActionError = {
   message: string;
 };
 
-export type ActionResult<T = void> = ActionSuccess<T> | ActionError;
+export type ActionBanned = {
+  status: "banned";
+};
+
+export type ActionResult<T = void> = ActionSuccess<T> | ActionError | ActionBanned;

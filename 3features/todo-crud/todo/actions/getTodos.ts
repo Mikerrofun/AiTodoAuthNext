@@ -3,13 +3,13 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/5shared/lib/auth/authOptions";
 import { prisma } from "@/prisma/client";
-import { ActionResult } from "@/5shared/lib/types/action-result";
+import { ActionSuccess, ActionError } from "@/5shared/lib/types/action-result";
 import { TodoItem } from "@entities/todo";
 import { redis } from "@/5shared/lib/redis/redis";
 
 const CACHE_TTL = 300;
 
-export async function getTodos(): Promise<ActionResult<TodoItem[]>> {
+export async function getTodos(): Promise<ActionSuccess<TodoItem[]> | ActionError> {
   const session = await getServerSession(authOptions);
 
   if (!session?.user?.id) {

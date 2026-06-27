@@ -23,7 +23,8 @@ model User {
   password String 
   login String @unique
   role Role @default(USER)
-  bannedAt  DateTime?
+  bannedAt    DateTime?
+  bannedUntil DateTime?
   createdAt DateTime @default(now()) 
   todos Todo[]
 }

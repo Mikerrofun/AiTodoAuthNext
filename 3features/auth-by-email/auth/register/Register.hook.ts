@@ -21,6 +21,7 @@ export function useRegister() {
 
   const handleOnSubmit = handleSubmit(async (data: RegisterFormData) => {
     setServerError(null)
+    
     const result = await registerUser(data)
 
     if (result.status === "error") {
@@ -28,7 +29,6 @@ export function useRegister() {
       return
     }
 
-    // Юзер создан — логиним его чтобы получить сессию
     const signInResult = await signIn("credentials", {
       redirect: false,
       login: data.login,

@@ -3,7 +3,7 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/5shared/lib/auth/authOptions";
 import { prisma } from "@/prisma/client";
-import { ActionResult } from "@/5shared/lib/types/action-result";
+import { ActionSuccess, ActionError } from "@/5shared/lib/types/action-result";
 import { redis } from "@/5shared/lib/redis/redis";
 
 const CACHE_KEY = "admin:users";
@@ -17,7 +17,7 @@ export type UserItem = {
   bannedAt: Date | null;
 };
 
-export async function getUsers(): Promise<ActionResult<UserItem[]>> {
+export async function getUsers(): Promise<ActionSuccess<UserItem[]> | ActionError> {
   const session = await getServerSession(authOptions);
 
   

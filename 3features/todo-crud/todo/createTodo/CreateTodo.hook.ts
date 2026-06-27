@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { createTodoSchema, CreateTodoFormData } from "./CreateTodo.type";
 import { createTodo } from "@features/todo-crud/todo/actions/createTodo";
+import { useSessionStore } from "@/5shared/store/useSessionStore";
 
 type Options = {
   onSuccess: () => void;
@@ -12,6 +13,7 @@ type Options = {
 
 export function useCreateTodo({ onSuccess }: Options) {
   const [serverError, setServerError] = useState<string | null>(null);
+  const setBanned = useSessionStore((s) => s.setBanned);
 
   const {
     register,
@@ -26,10 +28,11 @@ export function useCreateTodo({ onSuccess }: Options) {
   const handleOnSubmit = handleSubmit(async (data: CreateTodoFormData) => {
     setServerError(null);
     const result = await createTodo(data);
-    console.log("[createTodo] result:", result);
     if (result.status === "success") {
       reset();
       onSuccess();
+    } else if (result.status === "banned") {
+      setBanned(true);
     } else {
       setServerError(result.message);
     }
