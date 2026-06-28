@@ -57,6 +57,9 @@ export const authOptions: NextAuthOptions = {
       if (token.userId && session.user) {
         session.user.id = token.userId;
         session.user.role = token.role;
+        
+        const banned = await redis.get(`blacklist:${token.userId}`);
+        session.user.isBanned = !!banned;
       }
       return session;
     },

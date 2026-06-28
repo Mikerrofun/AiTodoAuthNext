@@ -8,7 +8,6 @@ import { TodoItem } from "@entities/todo";
 import { CreateTodoFormData } from "@features/todo-crud/todo/createTodo/CreateTodo.type";
 import { revalidatePath } from "next/cache";
 import { redis } from "@/5shared/lib/redis/redis";
-import { checkUserBan } from "@/5shared/lib/auth/checkBan";
 
 export async function createTodo(data: CreateTodoFormData): Promise<ActionResult<TodoItem>> {
   const session = await getServerSession(authOptions);
@@ -17,7 +16,7 @@ export async function createTodo(data: CreateTodoFormData): Promise<ActionResult
     return { status: "error", message: "Не авторизован" };
   }
 
-  if (await checkUserBan(session.user.id)) {
+  if (session.user.isBanned) {
     return { status: "banned" };
   }
 
