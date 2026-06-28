@@ -5,6 +5,29 @@
   --foreground: #171717;
 }
 
+/* Smooth "breathing" glow applied to the ban button itself.
+   Softer than Tailwind's animate-pulse — no harsh blinking.
+   The glow color is driven by the --glow-color CSS var per state. */
+@keyframes ban-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(0, 0, 0, 0);
+  }
+  50% {
+    box-shadow: 0 0 10px 1px var(--glow-color, rgba(0, 0, 0, 0.25));
+  }
+}
+
+.ban-glow {
+  animation: ban-glow 2.2s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ban-glow {
+    animation: none;
+  }
+}
+
 
 body {
   background: var(--background);
