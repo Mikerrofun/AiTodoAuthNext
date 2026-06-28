@@ -1,5 +1,6 @@
 import "./globals.css";
 import { QueryProvider } from "@/5shared/providers/QueryProvider";
+import { SessionProviderWrapper } from "@/5shared/providers/SessionProviderWrapper";
 import { Redirector } from "@/5shared/components/Redirector";
 
 export default function RootLayout({
@@ -10,8 +11,10 @@ export default function RootLayout({
   return (
     <html lang="ru">
       <body>
-        <QueryProvider>{children}</QueryProvider>
-        <Redirector />
+        <SessionProviderWrapper>
+          <QueryProvider>{children}</QueryProvider>
+          <Redirector />
+        </SessionProviderWrapper>
       </body>
     </html>
   );

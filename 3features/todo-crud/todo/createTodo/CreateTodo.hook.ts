@@ -3,9 +3,9 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useSession } from "next-auth/react";
 import { createTodoSchema, CreateTodoFormData } from "./CreateTodo.type";
 import { createTodo } from "@features/todo-crud/todo/actions/createTodo";
-import { useSessionStore } from "@/5shared/store/useSessionStore";
 
 type Options = {
   onSuccess: () => void;
@@ -13,7 +13,7 @@ type Options = {
 
 export function useCreateTodo({ onSuccess }: Options) {
   const [serverError, setServerError] = useState<string | null>(null);
-  const setBanned = useSessionStore((s) => s.setBanned);
+  const { update } = useSession();
 
   const {
     register,
@@ -32,7 +32,7 @@ export function useCreateTodo({ onSuccess }: Options) {
       reset();
       onSuccess();
     } else if (result.status === "banned") {
-      setBanned(true);
+      await update(); // Перечитает сессию с сервера, Redirector увидит isBanned
     } else {
       setServerError(result.message);
     }

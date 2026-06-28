@@ -2,18 +2,18 @@
 
 import { useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
-import { useSessionStore } from "@/5shared/store/useSessionStore";
+import { useSession } from "next-auth/react";
 
 export function Redirector() {
   const router = useRouter();
   const pathname = usePathname();
-  const isBanned = useSessionStore((s) => s.isBanned);
+  const { data: session } = useSession();
 
   useEffect(() => {
-    if (isBanned && pathname !== "/banned") {
+    if (session?.user?.isBanned && pathname !== "/banned") {
       router.push("/banned");
     }
-  }, [isBanned, pathname, router]);
+  }, [session?.user?.isBanned, pathname, router]);
 
   return null;
 }
