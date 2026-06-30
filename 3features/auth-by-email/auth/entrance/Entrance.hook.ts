@@ -5,6 +5,7 @@ import { checkLoginStatus } from "@/3features/auth-by-email/auth/actions/checkLo
 import { signIn } from "next-auth/react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { getAuthErrorMessage } from "@/5shared/lib/auth/authErrors";
 
 export function useEntrance() {
   const router = useRouter();
@@ -36,7 +37,9 @@ export function useEntrance() {
     });
 
     if (result?.error) {
-      setServerError("Неверный логин или пароль");
+      // Get translated error message from error code
+      const errorMessage = getAuthErrorMessage(result.error);
+      setServerError(errorMessage);
       return;
     }
 

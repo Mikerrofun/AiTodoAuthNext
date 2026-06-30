@@ -4,7 +4,7 @@ import { useRegister } from "./Register.hook";
 import { AuthNavLink } from "@/5shared/ui/AuthNavLink/AuthNavLink";
 
 export function Register() {
-  const { register, handleOnSubmit, errors } = useRegister();
+  const { register, handleOnSubmit, errors, serverError, isSubmitting } = useRegister();
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -48,11 +48,16 @@ export function Register() {
             )}
           </div>
 
+          {serverError && (
+            <span className="text-xs text-red-500 text-center">{serverError}</span>
+          )}
+
           <button
             type="submit"
-            className="mt-2 bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 rounded-lg transition"
+            disabled={isSubmitting}
+            className="mt-2 bg-blue-500 hover:bg-blue-600 disabled:opacity-50 text-white font-medium py-2 rounded-lg transition"
           >
-            Зарегистрироваться
+            {isSubmitting ? "Загрузка..." : "Зарегистрироваться"}
           </button>
         </form>
 
