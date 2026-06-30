@@ -5,6 +5,8 @@ import GithubProvider from "next-auth/providers/github";
 import { prisma } from "@/prisma/client";
 import bcrypt from "bcrypt";
 import { redis } from "@/5shared/lib/redis/redis";
+import { checkTokenBucket, RATE_LIMITS } from "@/5shared/lib/rateLimit";
+import { AuthErrorCode } from "@/5shared/lib/auth/authErrors";
 
 
 export const authOptions: NextAuthOptions = {
@@ -14,8 +16,34 @@ export const authOptions: NextAuthOptions = {
         login: { label: "Login", type: "text" },
         password: { label: "Password", type: "password" },
       },
-      async authorize(credentials) {
+      async authorize(credentials, req) {
         if (!credentials?.login || !credentials?.password) return null;
+
+        const forwarded = req.headers?.["x-forwarded-for"];
+        const ip = forwarded
+          ? (Array.isArray(forwarded) ? forwarded[0] : forwarded.split(",")[0].trim())
+          : "unknown";
+
+        if (ip === "unknown" && process.env.NODE_ENV === "production") {
+          return null;
+        }
+         
+        const login = credentials.login;
+
+        // Level 1: Check IP-based rate limit
+        const ipKey = `ratelimit:login:ip:${ip}`;
+        const ipAllowed = await checkTokenBucket(ipKey, RATE_LIMITS.LOGIN_BY_IP);
+
+        if (!ipAllowed) {
+          throw new Error(AuthErrorCode.RATE_LIMIT_IP);
+        }
+
+        const accountKey = `ratelimit:login:account:${ip}:${login}`;
+        const accountAllowed = await checkTokenBucket(accountKey, RATE_LIMITS.LOGIN_BY_ACCOUNT);
+
+        if (!accountAllowed) {
+          throw new Error(AuthErrorCode.RATE_LIMIT_ACCOUNT);
+        }
 
         const user = await prisma.user.findUnique({
           where: { login: credentials.login },
