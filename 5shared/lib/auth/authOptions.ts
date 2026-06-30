@@ -5,6 +5,7 @@ import GithubProvider from "next-auth/providers/github";
 import { prisma } from "@/prisma/client";
 import bcrypt from "bcrypt";
 import { redis } from "@/5shared/lib/redis/redis";
+import { checkTokenBucket, RATE_LIMITS } from "@/5shared/lib/rateLimit";
 
 
 export const authOptions: NextAuthOptions = {
@@ -14,8 +15,25 @@ export const authOptions: NextAuthOptions = {
         login: { label: "Login", type: "text" },
         password: { label: "Password", type: "password" },
       },
-      async authorize(credentials) {
+      async authorize(credentials, req) {
         if (!credentials?.login || !credentials?.password) return null;
+
+        const forwarded = req.headers?.["x-forwarded-for"];
+        const ip = forwarded
+          ? (Array.isArray(forwarded) ? forwarded[0] : forwarded.split(",")[0].trim())
+          : "unknown";
+
+        if (ip === "unknown" && process.env.NODE_ENV === "production") {
+          return null;
+        }
+         
+        const login = credentials.login;
+        const key = `ratelimit:login:${ip}:${login}`;
+        const isAllowed = await checkTokenBucket(key, RATE_LIMITS.LOGIN);
+
+        if (!isAllowed) {
+          return null;
+        }
 
         const user = await prisma.user.findUnique({
           where: { login: credentials.login },
