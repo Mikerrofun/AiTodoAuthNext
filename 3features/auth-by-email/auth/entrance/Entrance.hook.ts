@@ -4,7 +4,7 @@ import { entranceSchema, type EntranceFormData, type OAuthProvider } from "./Ent
 import { checkLoginStatus } from "@/3features/auth-by-email/auth/actions/checkLoginStatus";
 import { signIn } from "next-auth/react";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@/5shared/navigation";
 import { getAuthErrorMessage } from "@/5shared/lib/auth/authErrors";
 
 export function useEntrance() {

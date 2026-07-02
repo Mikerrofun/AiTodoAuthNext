@@ -1,7 +1,9 @@
+import { useTranslations } from 'next-intl';
 import { getUsers } from "@features/admin-users/users/actions/getUsers";
 import { UserListClient } from "./UserListClient";
 
 export async function UserList() {
+  const t = useTranslations('UserList');
   const result = await getUsers();
 
   if (result.status === "error") {
@@ -15,7 +17,7 @@ export async function UserList() {
   if (!result.data || result.data.length === 0) {
     return (
       <div className="mt-4 p-4 bg-gray-50 border border-gray-200 rounded text-gray-600">
-        Пользователей пока нет
+        {t('emptyState')}
       </div>
     );
   }

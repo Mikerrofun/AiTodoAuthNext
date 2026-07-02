@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { Link } from "@/5shared/navigation";
 
 type AuthNavLinkProps = {
   text: string;

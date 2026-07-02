@@ -1,6 +1,6 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/5shared/lib/auth/authOptions";
-import Link from "next/link";
+import { Link } from "@/5shared/navigation";
 
 type AdminLinkProps = {
   isAdminPage: boolean;
