@@ -1,9 +1,11 @@
 "use client";
 
+import { useTranslations } from 'next-intl';
 import { useBanButton } from "./BanButton.hook";
 import { BanButtonProps } from "./BanButton.type";
 
 export function BanButton({ userId, bannedAt }: BanButtonProps) {
+  const t = useTranslations('BanButton');
   const { isBanned, handleClick } = useBanButton(userId, bannedAt);
 
   // Fixed width so the longer "unBan User" label never widens the row.
@@ -20,7 +22,7 @@ export function BanButton({ userId, bannedAt }: BanButtonProps) {
       style={{ ["--glow-color" as string]: glowColor }}
       className={`ban-glow ${bgClasses} w-24 transition-colors duration-500 px-3 py-1 text-xs font-medium text-white rounded-full`}
     >
-      {isBanned ? "unBan User" : "Ban User"}
+      {isBanned ? t('unban') : t('ban')}
     </button>
   );
 }

@@ -1,6 +1,7 @@
 "use server";
 
 import { getServerSession } from "next-auth";
+import { getTranslations } from "next-intl/server";
 import { authOptions } from "@/5shared/lib/auth/authOptions";
 import { prisma } from "@/prisma/client";
 import { ActionSuccess, ActionError } from "@/5shared/lib/types/action-result";
@@ -18,15 +19,16 @@ export type UserItem = {
 };
 
 export async function getUsers(): Promise<ActionSuccess<UserItem[]> | ActionError> {
+  const t = await getTranslations('Errors');
   const session = await getServerSession(authOptions);
 
   
   if (!session?.user) {
-    return { status: "error", message: "Не авторизован" };
+    return { status: "error", message: t('unauthorized') };
   }
 
   if (session.user?.role !== "ADMIN") {
-    return { status: "error", message: "Недостаточно прав" };
+    return { status: "error", message: t('forbidden') };
   }
 
   try {
@@ -49,6 +51,6 @@ export async function getUsers(): Promise<ActionSuccess<UserItem[]> | ActionErro
 
     return { status: "success", data: users };
   } catch {
-    return { status: "error", message: "Что-то пошло не так" };
+    return { status: "error", message: t('somethingWrong') };
   }
 }

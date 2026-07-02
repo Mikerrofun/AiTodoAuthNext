@@ -4,7 +4,7 @@ import { registerSchema, type RegisterFormData } from "./Register.type";
 import { registerUser } from "@/3features/auth-by-email/auth/actions/register";
 import { signIn } from "next-auth/react";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@/5shared/navigation";
 
 export function useRegister() {
   const router = useRouter()

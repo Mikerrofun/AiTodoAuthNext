@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { useRouter, usePathname } from "next/navigation";
+import { useRouter, usePathname } from "@/5shared/navigation";
 import { useSession } from "next-auth/react";
 
 export function Redirector() {

@@ -1,0 +1,45 @@
+{
+  "AdminPage": {
+    "title": "Панель администратора",
+    "description": "Управление пользователями и данными",
+    "loading": "Загрузка пользователей..."
+  },
+  "UserList": {
+    "emptyState": "Пользователей пока нет",
+    "errorLoading": "Ошибка загрузки"
+  },
+  "UserListClient": {
+    "headers": {
+      "id": "ID",
+      "login": "Логин",
+      "role": "Роль",
+      "registrationDate": "Дата регистрации",
+      "status": "Статус"
+    }
+  },
+  "UserRow": {
+    "roleAdmin": "ADMIN"
+  },
+  "BanButton": {
+    "ban": "Ban User",
+    "unban": "unBan User"
+  },
+  "UserTodoList": {
+    "loading": "Загрузка задач...",
+    "emptyState": "У пользователя {userName} пока нет задач",
+    "tasksCount": "Задачи пользователя {userName} ({count})",
+    "errorBoundary": "Ошибка загрузки задач",
+    "errorQuery": "Ошибка: {error}",
+    "deleting": "Удаление...",
+    "deleteError": "Ошибка при удалении"
+  },
+  "TodoItem": {
+    "created": "Создано: {date}",
+    "deleted": "Удалено",
+    "deleteButton": "Удалить задачу",
+    "alreadyDeleted": "Уже удалено"
+  },
+  "SuspenseLoader": {
+    "default": "Загрузка..."
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "unauthorized": "Unauthorized",
+  "forbidden": "Insufficient permissions",
+  "somethingWrong": "Something went wrong",
+  "banFailed": "Failed to ban user",
+  "unbanFailed": "Failed to unban user",
+  "deleteFailed": "Failed to delete task"
+}

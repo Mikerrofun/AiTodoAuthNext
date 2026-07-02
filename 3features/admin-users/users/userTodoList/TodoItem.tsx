@@ -1,7 +1,9 @@
 import { memo } from "react";
+import { useTranslations } from 'next-intl';
 import { TodoItemProps } from "./UserTodoList.type";
 
 function TodoItemComponent({ todo, onDelete }: TodoItemProps) {
+  const t = useTranslations('TodoItem');
   const isDeleted = todo.deletedAt !== null;
 
   return (
@@ -48,11 +50,11 @@ function TodoItemComponent({ todo, onDelete }: TodoItemProps) {
             </div>
           )}
           <div className="text-xs text-gray-400 mt-1">
-            Создано: {new Date(todo.createdAt).toLocaleDateString("ru-RU")}
+            {t('created', { date: new Date(todo.createdAt).toLocaleDateString() })}
           </div>
           {isDeleted && (
             <div className="text-xs text-red-500 font-semibold mt-1">
-              Удалено
+              {t('deleted')}
             </div>
           )}
         </div>
@@ -62,7 +64,7 @@ function TodoItemComponent({ todo, onDelete }: TodoItemProps) {
           onClick={() => onDelete(todo.id)}
           disabled={isDeleted}
           className="flex-shrink-0 p-1 hover:bg-red-50 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          title={isDeleted ? "Уже удалено" : "Удалить задачу"}
+          title={isDeleted ? t('alreadyDeleted') : t('deleteButton')}
         >
           <svg
             className="w-4 h-4 text-red-500"

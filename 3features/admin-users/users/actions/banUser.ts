@@ -1,6 +1,7 @@
 "use server";
 
 import { getServerSession } from "next-auth";
+import { getTranslations } from "next-intl/server";
 import { authOptions } from "@/5shared/lib/auth/authOptions";
 import { prisma } from "@/prisma/client";
 import { ActionResult } from "@/5shared/lib/types/action-result";
@@ -10,14 +11,15 @@ export async function banUser(
   userId: number,
   durationSeconds?: number,
 ): Promise<ActionResult<void>> {
+  const t = await getTranslations('Errors');
   const session = await getServerSession(authOptions);
 
   if (!session?.user) {
-    return { status: "error", message: "Не авторизован" };
+    return { status: "error", message: t('unauthorized') };
   }
 
   if (session.user.role !== "ADMIN") {
-    return { status: "error", message: "Недостаточно прав" };
+    return { status: "error", message: t('forbidden') };
   }
 
   try {
@@ -45,6 +47,6 @@ const updated = await prisma.user.update({
     await redis.del("admin:users");
     return { status: "success" };
   } catch {
-    return { status: "error", message: "Не удалось забанить юзера" };
+    return { status: "error", message: t('banFailed') };
   }
 }

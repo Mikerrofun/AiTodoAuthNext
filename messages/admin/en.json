@@ -1,0 +1,45 @@
+{
+  "AdminPage": {
+    "title": "Admin Dashboard",
+    "description": "Manage users and data",
+    "loading": "Loading users..."
+  },
+  "UserList": {
+    "emptyState": "No users yet",
+    "errorLoading": "Error loading"
+  },
+  "UserListClient": {
+    "headers": {
+      "id": "ID",
+      "login": "Login",
+      "role": "Role",
+      "registrationDate": "Registration Date",
+      "status": "Status"
+    }
+  },
+  "UserRow": {
+    "roleAdmin": "ADMIN"
+  },
+  "BanButton": {
+    "ban": "Ban User",
+    "unban": "unBan User"
+  },
+  "UserTodoList": {
+    "loading": "Loading tasks...",
+    "emptyState": "User {userName} has no tasks yet",
+    "tasksCount": "Tasks of {userName} ({count})",
+    "errorBoundary": "Error loading tasks",
+    "errorQuery": "Error: {error}",
+    "deleting": "Deleting...",
+    "deleteError": "Error deleting"
+  },
+  "TodoItem": {
+    "created": "Created: {date}",
+    "deleted": "Deleted",
+    "deleteButton": "Delete task",
+    "alreadyDeleted": "Already deleted"
+  },
+  "SuspenseLoader": {
+    "default": "Loading..."
+  }
+}
